@@ -11,14 +11,53 @@ import (
 )
 
 var dbCon *pgx.Conn
+var pingTicker *time.Ticker
+var dbRestartTicker *time.Ticker
 
 func init() {
 	var err error
 	var dbUrl = os.Getenv("PDB_URL")
+
 	dbCon, err = pgx.Connect(context.Background(), dbUrl)
+
 	if err != nil {
 		log.Println("DB error: ", err.Error())
 	}
+	/// Check if db is still connected
+	/// Ping render to keep the server alive
+	pingTicker = time.NewTicker(time.Minute * 10)
+	dbRestartTicker = time.NewTicker(time.Second * 10)
+
+	go func() {
+		/*for range pingTicker.C {
+			pingRender()
+		}*/
+
+		for {
+			select {
+			case <-pingTicker.C:
+				pingRender()
+			case <-dbRestartTicker.C:
+				/*err := dbCon.Ping(context.Background())
+				if err != nil {
+					log.Println(err)
+				}
+
+				fmt.Println("Executed", dbCon.IsClosed())*/
+				if dbCon.IsClosed() {
+					err = dbCon.Close(context.Background())
+					if err != nil {
+						log.Println(err)
+					}
+					dbCon, err = pgx.Connect(context.Background(), dbUrl)
+					log.Println("Restarted connection")
+					if err != nil {
+						log.Println("DB restart error: ", err.Error())
+					}
+				}
+			}
+		}
+	}()
 
 }
 func main() {
@@ -47,6 +86,8 @@ func main() {
 
 		}
 	}(dbCon, context.Background())
+	defer pingTicker.Stop()
+	defer dbRestartTicker.Stop()
 
 	/// Launch server
 	log.Fatal(srv.ListenAndServe())
