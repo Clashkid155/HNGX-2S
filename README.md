@@ -1,7 +1,5 @@
 # A dead simple, CRUD REST API
-This project provides a simple REST API for managing person records, allowing you to perform CRUD (Create, Read, Update, Delete) operations. This README.md file contains detailed instructions on setting up, running, and using the API.
-
-# TODO
+This Repo contains code which performs CRUD methods on a Person object.
 
 > **LIVE API:** https://personapi-l9ah.onrender.com/api
 >
