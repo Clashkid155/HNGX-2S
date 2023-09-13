@@ -6,17 +6,15 @@ import (
 	"github.com/jackc/pgx/v5"
 	"log"
 	"net/http"
+	"os"
 	"time"
-)
-
-const (
-	dbUrl = ""
 )
 
 var dbCon *pgx.Conn
 
 func init() {
 	var err error
+	var dbUrl = os.Getenv("PDB_URL")
 	dbCon, err = pgx.Connect(context.Background(), dbUrl)
 	if err != nil {
 		log.Println("DB error: ", err.Error())
