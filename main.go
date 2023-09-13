@@ -11,7 +11,6 @@ import (
 )
 
 var dbCon *pgx.Conn
-var pingTicker *time.Ticker
 var dbRestartTicker *time.Ticker
 
 func init() {
@@ -25,7 +24,7 @@ func init() {
 	}
 	/// Check if db is still connected
 	/// Ping render to keep the server alive
-	pingTicker = time.NewTicker(time.Minute * 10)
+
 	dbRestartTicker = time.NewTicker(time.Second * 10)
 
 	go func() {
@@ -35,8 +34,6 @@ func init() {
 
 		for {
 			select {
-			case <-pingTicker.C:
-				pingRender()
 			case <-dbRestartTicker.C:
 				/*err := dbCon.Ping(context.Background())
 				if err != nil {
@@ -86,7 +83,6 @@ func main() {
 
 		}
 	}(dbCon, context.Background())
-	defer pingTicker.Stop()
 	defer dbRestartTicker.Stop()
 
 	/// Launch server
