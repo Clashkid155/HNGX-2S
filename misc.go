@@ -7,6 +7,7 @@ import (
 
 type Response struct {
 	Id      int    `json:"id,omitempty"`
+	Name    string `json:"name,omitempty"`
 	Message string `json:"message"`
 	Status  string `json:"status"`
 }
