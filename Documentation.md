@@ -7,10 +7,11 @@ This document provides detailed information on how to use the REST API for the "
 ## Table of Contents
 
 - [Setup Instructions](#setup-instructions)
-- [API Endpoints](#api-endpoints)
-- [Request & Response Formats](#requestresponse-formats)
+- [API Endpoints](#endpoints)
+- [Request and Response Formats](#request-and-response-formats)
 - [Sample API Usage](#sample-api-usage)
-- [Known Limitations and Assumptions](#known-limitations-and-assumptions)
+- [Assumptions](#assumptions)
+- [Known Limitations](#known-limitations)
 
 ---
 
@@ -68,7 +69,7 @@ Endpoints available on the API:
 
 ---
 
-## Request & Response Formats
+## Request and Response Formats
 
 ### Create a Person
 
