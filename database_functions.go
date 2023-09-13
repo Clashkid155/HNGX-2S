@@ -6,10 +6,19 @@ import (
 	"fmt"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	PersonNotFoundDB = "no rows in result set"
+	// PersonNotDeleted This is an error message
+	PersonNotDeleted = "person not deleted. incorrect input parameter"
+	// PersonNotUpdated This is an error message
+	PersonNotUpdated = "person not updated. incorrect input parameter"
 )
 
 func createUser(user string) (id int, err error) {
@@ -19,7 +28,7 @@ func createUser(user string) (id int, err error) {
 	if err != nil {
 		log.Println(err)
 		if strings.Contains(err.Error(), pgerrcode.UniqueViolation) {
-			err = errors.New(fmt.Sprintf("Name: %s, already exist", user))
+			err = errors.New(fmt.Sprintf("name: %s, already exist", user))
 		}
 	}
 
@@ -28,7 +37,7 @@ func createUser(user string) (id int, err error) {
 	return
 }
 func updateUser(userId string, newName string) (id int, err error) {
-
+	var deletedRow pgconn.CommandTag
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -38,19 +47,28 @@ func updateUser(userId string, newName string) (id int, err error) {
 			log.Println(err)
 			return
 		}
-		_, err = dbCon.Exec(ctx, ""+
+		deletedRow, err = dbCon.Exec(ctx, ""+
 			"UPDATE persons SET name = $1 WHERE id = $2", newName, id)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+		if deletedRow.RowsAffected() == 0 {
+			err = errors.New(PersonNotUpdated)
+			return
+		}
 	} else {
 		p := dbCon.QueryRow(ctx, ""+
-			"UPDATE persons SET name = $1 WHERE  id = $2 RETURNING id", newName, userId)
+			"UPDATE persons SET name = $1 WHERE  name = $2 RETURNING id", newName, userId)
 		err = p.Scan(&id)
 		if err != nil {
-			log.Println("Error from, GetUser: ", err)
+			if strings.Contains(err.Error(), PersonNotFoundDB) {
+				err = errors.New(PersonNotUpdated)
+				return
+			}
+			log.Println("error: ", err)
 		}
+
 	}
 
 	return
@@ -58,6 +76,7 @@ func updateUser(userId string, newName string) (id int, err error) {
 func deleteUser(value string) (err error) {
 
 	var id int
+	var deletedRow pgconn.CommandTag
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -67,19 +86,23 @@ func deleteUser(value string) (err error) {
 			log.Println(err)
 			return
 		}
-		_, err = dbCon.Exec(ctx, ""+
+		deletedRow, err = dbCon.Exec(ctx, ""+
 			"DELETE FROM persons WHERE id = $1", id)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+
 	} else {
-		_, err = dbCon.Exec(ctx, ""+
+		deletedRow, err = dbCon.Exec(ctx, ""+
 			"DELETE FROM persons WHERE name = $1", value)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+	}
+	if deletedRow.RowsAffected() == 0 {
+		err = errors.New(PersonNotDeleted)
 	}
 	return
 
@@ -103,8 +126,11 @@ func getUser(value string) (name string, idDb int, err error) {
 	}
 	err = person.Scan(&name, &idDb)
 	if err != nil {
-		log.Println("Error from, GetUser: ", err)
+		if strings.Contains(err.Error(), PersonNotFoundDB) {
+			err = errors.New("person not found")
+			return
+		}
+		log.Println("error: ", err)
 	}
-	fmt.Println(name)
 	return
 }
