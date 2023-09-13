@@ -19,12 +19,6 @@ func jsonContent(next http.Handler) http.Handler {
 	})
 }
 func isDigit(value string) bool {
-	/*data, err := strconv.Atoi(value.(string))
-
-	if err != nil {
-		log.Println("This is not an int")
-	}
-	fmt.Println(data)*/
 	isNum := regexp.MustCompile(`^\d+$`)
 
 	return isNum.MatchString(value)
