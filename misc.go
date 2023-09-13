@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -22,4 +23,12 @@ func isDigit(value string) bool {
 	isNum := regexp.MustCompile(`^\d+$`)
 
 	return isNum.MatchString(value)
+}
+
+// / pingRender Keep pinging render to prevent sleeping
+func pingRender() {
+	_, err := http.Get("https://personapi-l9ah.onrender.com/api")
+	if err != nil {
+		log.Println(err)
+	}
 }
