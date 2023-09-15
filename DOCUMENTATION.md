@@ -1,6 +1,6 @@
 # Project Documentation
 
-This document provides detailed information on how to use the REST API for the "Person" resource. Please refer to this documentation for setup instructions, request/response formats, sample API usage, and any known limitations or assumptions made during development.
+This document provides detailed information on how to use the REST API for the "Person" resource. Please refer to this documentation for setup instructions, request & response formats, sample API usage,limitations or assumptions made during development.
 
 
 
@@ -49,7 +49,7 @@ Follow these steps to set up and run the API locally:
 Endpoints available on the API:
 
 - **Create a Person**:
-    - **POST /api/**
+    - **POST /api**
     - Add a new person to the database.
 
 
@@ -108,7 +108,7 @@ NONE
 ```
 ---
 
-### Read a Person
+### Get a Person
 
 #### Request
 ```http request
@@ -120,7 +120,7 @@ GET http://127.0.0.1:8080/api/{name|id}
 | Parameter Name | Value   | Description                                  |        Additional         |
 |:--------------:|---------|----------------------------------------------|:-------------------------:|
 |      name      | string  | Person's name                                |         Required          |
-|       id       | integer | Person's  id from returned from the database |  Use either name or this  |
+|       id       | integer | Person's  id returned from the database |  Use either name or this  |
 
 #### Request Body
 ```text
@@ -158,7 +158,7 @@ PUT http://127.0.0.1:8080/api/{name|id}
 | Parameter Name | Value   | Description                                  |        Additional         |
 |:--------------:|---------|----------------------------------------------|:-------------------------:|
 |      name      | string  | Person's name                                |         Required          |
-|       id       | integer | Person's  id from returned from the database |  Use either name or this  |
+|       id       | integer | Person's  id returned from the database |  Use either name or this  |
 
 #### Request Body
 ```json
@@ -198,7 +198,7 @@ DELETE http://127.0.0.1:8080/api/{name|id}
 | Parameter Name | Value   | Description                                  |        Additional         |
 |:--------------:|---------|----------------------------------------------|:-------------------------:|
 |      name      | string  | Person's name                                |         Required          |
-|       id       | integer | Person's  id from returned from the database |  Use either name or this  |
+|       id       | integer | Person's  id returned from the database |  Use either name or this  |
 
 #### Request Body
 ```text
